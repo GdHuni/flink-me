@@ -24,8 +24,8 @@ import org.apache.flink.util.Collector;
  */
 public class WordCountJavaBatch {
     public static void main(String[] args) throws Exception {
-        String inputPath = "D:\\data\\input\\hello.txt";
-        String outputPath = "D:\\data\\output";
+        String inputPath = "D:\\A_E\\hello.txt";
+        String outputPath = "D:\\A_E\\output";
 
         //获取flink的运行环境
         ExecutionEnvironment executionEnvironment = ExecutionEnvironment.getExecutionEnvironment();

@@ -11,15 +11,15 @@ import org.apache.flink.api.scala._
 object WordCountScalaBatch {
   def main(args: Array[String]): Unit = {
     //定义输入输出文件
-    val in = "D:\\源D盘\\最近项目\\a.txt"
-    val out = "D:\\源D盘\\最近项目\\b.txt"
+    val in: String = "D:\\A_E\\hello.txt"
+    val out: String = "D:\\A_E\\outputscala.txt"
     //定义flink运行环境
     val environment: ExecutionEnvironment = ExecutionEnvironment.getExecutionEnvironment
     val value: DataSet[String] = environment.readTextFile(in);
     //实现自己的业务
     val value1: AggregateDataSet[(String, Int)] = value.flatMap(_.split(" ")).map((_, 1)).groupBy(0).sum(1)
     //输出到文件
-    value1.writeAsText(out).setParallelism(1);
+    value1.writeAsText(out).setParallelism(1)
 
     //执行（懒加载的）
     environment.execute()

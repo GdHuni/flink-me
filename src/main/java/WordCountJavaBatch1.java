@@ -26,20 +26,27 @@ import org.apache.flink.util.Collector;
 public class WordCountJavaBatch1 {
     public static void main(String[] args) throws Exception {
         //定义输入输出文件
-        String in = "D:\\源D盘\\最近项目\\a.txt";
-        String out = "D:\\源D盘\\最近项目\\b.txt";
+        String in = "D:\\A_E\\hello.txt";
+        String out = "D:\\A_E\\outputJava.txt";
         //准备环境
         ExecutionEnvironment environment = ExecutionEnvironment.getExecutionEnvironment();
         //读取文件
         DataSource<String> ds = environment.readTextFile(in);
         //写业务
-        ds.flatMap(new MyCla());
+        FlatMapOperator<String, Tuple2<String, Integer>> tuple = ds.flatMap(new MyCla());
+        AggregateOperator<Tuple2<String, Integer>> sum = tuple.groupBy(0).sum(1).setParallelism(2);
+        sum.writeAsCsv(out);
+
+        environment.execute();
     }
    static  class MyCla implements FlatMapFunction<String, Tuple2<String,Integer>>{
 
         @Override
         public void flatMap(String s, Collector<Tuple2<String, Integer>> collector) throws Exception {
-
+            String[] lines = s.split(" ");
+            for (String line : lines) {
+                collector.collect(new Tuple2<>(line,1));
+            }
         }
     }
 }

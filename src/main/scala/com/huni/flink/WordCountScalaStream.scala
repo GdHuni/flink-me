@@ -10,10 +10,13 @@ import org.apache.flink.streaming.api.scala._
  */
 object WordCountScalaStream {
   def main(args: Array[String]): Unit = {
-    //1.准备环境
+    //处理流式数据
     val environment: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
-
-    environment.socketTextStream();
+    val streamData: DataStream[String] = environment.socketTextStream("linux121", 7777)
+    //setParallelism  每个算子可以设置自己独立的并行度
+    val out = streamData.flatMap(_.split(" ")).map((_, 1)).setParallelism(2).keyBy(0).sum(1)
+    out.print()
+    environment.execute()
   }
 
 
