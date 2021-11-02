@@ -184,7 +184,8 @@
     </dependencies>
     <build>
         <plugins>
-            <!-- 打jar插件 -->
+            
+            <!--打scala jar 插件 不用的话 提交代码后 没有scala代码-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -210,6 +211,8 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- 打全部依赖jar插件 -->
             <plugin>
                 <groupId>org.scala-tools</groupId>
                 <artifactId>maven-scala-plugin</artifactId>
