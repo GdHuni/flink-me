@@ -1,3 +1,5 @@
+package wordcount;
+
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
@@ -6,7 +8,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.util.Collector;
 
 /**
- * @Classname WordCountJavaStream
+ * @Classname wordcount.WordCountJavaStream
  * @Description java版本的flink流处理
  * @Date 2021/10/28 19:58
  * @Created by huni
