@@ -12,6 +12,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <clickhouse.version>0.2.3</clickhouse.version>
+        <fastjson.version>1.2.6</fastjson.version>
     </properties>
 
 
