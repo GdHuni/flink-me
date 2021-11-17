@@ -80,7 +80,11 @@ public class CustomRedisSinkFunction extends RichSinkFunction<Tuple2<String,Inte
     }
 
 
-
+    /**
+     * 初始化信息
+     * @param parameters
+     * @throws Exception
+     */
     @Override
     public void open(Configuration parameters) throws Exception {
         super.open(parameters);

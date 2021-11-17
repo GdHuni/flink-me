@@ -18,7 +18,7 @@ import org.apache.flink.streaming.connectors.redis.common.mapper.RedisMapper;
 import java.util.Properties;
 
 /**
- * @Classname CustomSinkToRedis
+ * @Classname CustomKafkaSourceToRedisSink
  * @Description 数据输出到RedisDemo,可以自定义去实现，也可以用flink包装好的RedisSink
  * @Date 2021/11/9 14:51
  * @Created by huni

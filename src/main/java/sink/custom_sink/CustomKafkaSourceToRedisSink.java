@@ -17,12 +17,12 @@ import org.apache.flink.streaming.connectors.redis.common.mapper.RedisMapper;
 import java.util.Properties;
 
 /**
- * @Classname CustomSinkToRedis
- * @Description 数据输出到RedisDemo
+ * @Classname CustomKafkaSourceToRedisSink
+ * @Description 从kafka获取数据输出到RedisDemo
  * @Date 2021/11/9 14:51
  * @Created by huni
  */
-public class CustomSinkToRedis {
+public class CustomKafkaSourceToRedisSink {
     public static void main(String[] args) throws Exception {
         //1.准备环境
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
