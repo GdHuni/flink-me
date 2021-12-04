@@ -1,6 +1,7 @@
 package code;
 
 import entity.PcWapVo;
+import org.apache.flink.api.common.eventtime.*;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.common.state.ListStateDescriptor;
@@ -28,6 +29,8 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.util.Collector;
 
 import java.net.URLDecoder;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Properties;
 
@@ -52,7 +55,7 @@ import java.util.Properties;
 public class DAU {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         //使用日志时间
         env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
         env.enableCheckpointing(10000);
@@ -87,22 +90,23 @@ public class DAU {
                             String wid = split[2].split("&wid=")[1].split("&mac=")[0];
                             String reportId = loc.split("id=")[1].split("&")[0].replaceAll("#", "");
                             String date = split[0].split(" ")[0];
+                            Date date1 = sdf.parse(split[0]);
+                            long ts = date1.getTime();
                             if(loc.contains("analysis/report/toDetail?id")){
-                                collector.collect(new Tuple2<>(new PcWapVo(loc, "埋点分析",reportId,date,wid), 1));
+                                collector.collect(new Tuple2<>(new PcWapVo(loc, "埋点分析",reportId,date,wid,ts), 1));
                             }else if(loc.contains("analysis/funnel/detail?id")){
-                                collector.collect(new Tuple2<>(new PcWapVo(loc, "漏斗分析",reportId,date,wid), 1));
+                                collector.collect(new Tuple2<>(new PcWapVo(loc, "漏斗分析",reportId,date,wid,ts), 1));
                             }else if(loc.contains("analysis/newreport/detail?id")){
-                                collector.collect(new Tuple2<>(new PcWapVo(loc, "自助分析",reportId,date,wid), 1));
+                                collector.collect(new Tuple2<>(new PcWapVo(loc, "自助分析",reportId,date,wid,ts), 1));
                             }else if(loc.contains("analysis/retained/detail?id")){
-                                collector.collect(new Tuple2<>(new PcWapVo(loc, "留存分析",reportId,date,wid), 1));
+                                collector.collect(new Tuple2<>(new PcWapVo(loc, "留存分析",reportId,date,wid,ts), 1));
                             }
                         }
                     }
                 });
-
         KeyedStream<Tuple2<PcWapVo, Integer>, String> KeyedStream = flatMap.keyBy(x -> x.f0.getType()+"_"+x.f0.getL_date()+"_"+x.f0.getReportId());
         KeyedStream.window(TumblingEventTimeWindows.of(Time.days(1),Time.hours(-8)))
-                .trigger(ContinuousProcessingTimeTrigger.of(Time.seconds(10)))
+                .trigger(ContinuousProcessingTimeTrigger.of(Time.seconds(100)))
                 .evictor(TimeEvictor.of(Time.seconds(0), true))
                 .process(new ProcessWindowFunction<Tuple2<PcWapVo, Integer>, PcWapVo, String, TimeWindow>() {
                     /* 如果长时间的窗口，比如：一天的窗口
