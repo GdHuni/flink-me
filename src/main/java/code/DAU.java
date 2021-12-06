@@ -1,10 +1,8 @@
 package code;
 
 import entity.PcWapVo;
-import org.apache.flink.api.common.eventtime.*;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
-import org.apache.flink.api.common.state.ListStateDescriptor;
 import org.apache.flink.api.common.state.MapState;
 import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.api.common.state.ValueState;
@@ -129,11 +127,7 @@ public class DAU {
                                 TypeInformation.of(new TypeHint<String>() {}),TypeInformation.of(new TypeHint<String>() {})
                         );
 
-                        ListStateDescriptor<String> listStateDescriptor = new ListStateDescriptor<>(
-                                "uvCount1",
-                                TypeInformation.of(new TypeHint<String>() {
-                                })
-                        );
+
                         //RuntimeContext是Function运行时的上下文，包含了Function在运行时需要的 所有信息，如并行度相关信息、Task名称、执行配置信息ExecutionConfig、State等
                         pvCount = getRuntimeContext().getState(pvCountDes);
                         uvCount = getRuntimeContext().getMapState(wordStateDes);
