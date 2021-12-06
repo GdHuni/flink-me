@@ -17,13 +17,14 @@ public class PcWapVo {
     private String l_date;
     private long pv;
     private long uv;
-
-    public PcWapVo(String loc, String type, String reportId, String l_date, String wid) {
+    private long ts;
+    public PcWapVo(String loc, String type, String reportId, String l_date, String wid,long ts) {
         this.loc = loc;
         this.type = type;
         this.reportId = reportId;
         this.l_date = l_date;
         this.wid = wid;
+        this.ts = ts;
     }
 
     public PcWapVo(String loc, String wid, String type, String createWorkerId, String reportId, long pv, long uv) {
@@ -47,6 +48,14 @@ public class PcWapVo {
 
     public String getL_date() {
         return l_date;
+    }
+
+    public long getTs() {
+        return ts;
+    }
+
+    public void setTs(long ts) {
+        this.ts = ts;
     }
 
     public void setL_date(String l_date) {
