@@ -1,10 +1,8 @@
 package code;
 
 import entity.PcWapVo;
-import org.apache.flink.api.common.eventtime.*;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
-import org.apache.flink.api.common.state.ListStateDescriptor;
 import org.apache.flink.api.common.state.MapState;
 import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.api.common.state.ValueState;
@@ -129,11 +127,7 @@ public class DAU {
                                 TypeInformation.of(new TypeHint<String>() {}),TypeInformation.of(new TypeHint<String>() {})
                         );
 
-                        ListStateDescriptor<String> listStateDescriptor = new ListStateDescriptor<>(
-                                "uvCount1",
-                                TypeInformation.of(new TypeHint<String>() {
-                                })
-                        );
+
                         //RuntimeContext是Function运行时的上下文，包含了Function在运行时需要的 所有信息，如并行度相关信息、Task名称、执行配置信息ExecutionConfig、State等
                         pvCount = getRuntimeContext().getState(pvCountDes);
                         uvCount = getRuntimeContext().getMapState(wordStateDes);
@@ -167,25 +161,10 @@ public class DAU {
                         out.collect(vo);
                     }
                 }).print();
+                /** 这里有个问题就是如果是插入到ch的话，但ch是不支持update和delete的（不友好），然后吧 引擎 设置为 ENGINE = ReplacingMergeTree
+                 但是他又是不定时更新的。所以一直不能实时起来，后面想的是  吧数据实时落地到ch中，不做处理，在建一个视图来进行count 和count（distinct id）来统计pv,uv
 
-
-     /*   timeWindow.apply(new WindowFunction<Tuple2<PcWapVo, Integer>, String, String, TimeWindow>() {
-            @Override
-            public void apply(String data, TimeWindow window, Iterable<Tuple2<PcWapVo, Integer>> input, Collector<String> out) throws Exception {
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                int sum = 0;
-
-                for(Tuple2<PcWapVo,Integer> tuple2 : input){
-                    sum +=tuple2.f1;
-                }
-                //窗口的开始和结束时间
-                long start = window.getStart();
-                long end = window.getEnd();
-                out.collect("key:" + data + " value: " + sum + "| window_start :"
-                        + format.format(start) + "  window_end :" + format.format(end)
-                );
-            }
-        }).print();*/
+                 */
 
         env.execute();
 

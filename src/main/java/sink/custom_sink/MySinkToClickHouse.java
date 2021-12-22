@@ -13,11 +13,9 @@ import java.sql.PreparedStatement;
 
 
 /**
- *         <dependency>
- *             <groupId>com.github.housepower</groupId>
- *             <artifactId>clickhouse-native-jdbc</artifactId>
- *             <version>1.6-stable</version>
- *         </dependency>
+ * flink to ch
+ * 报错可以参考
+ * https://blog.csdn.net/zh17673640696/article/details/121721484
  */
 public class MySinkToClickHouse {
     public static void main(String[] args) throws Exception {
@@ -32,11 +30,10 @@ public class MySinkToClickHouse {
 
         DataStreamSource<ChBean> data = env.fromElements(b1,b2,b3,b4,b5);
 
-        //String chDriver = "com.github.housepower.jdbc.ClickHouseDriver";
-        String chDriver ="ru.yandex.clickhouse.ClickHouseDriver";
         //jdbc:clickhouse://192.168.216.2:8123/lyj_ch_dw
+        String chDriver ="ru.yandex.clickhouse.ClickHouseDriver";
         Class.forName(chDriver);
-        String chUrl = " jdbc:clickhouse://172.16.5.32:8123/tmp";
+        String chUrl = "jdbc:clickhouse://172.16.5.32:8123/tmp";
         data.addSink(new RichSinkFunction<ChBean>() {
             Connection conn;
             PreparedStatement pst;
@@ -44,8 +41,8 @@ public class MySinkToClickHouse {
             public void open(Configuration parameters) throws Exception {
                 conn = DriverManager.getConnection(chUrl);
                 String sql = "insert into tmp.jdbc_example (day,name,age) values (?,?,?)";
-               // pst = conn.prepareStatement(sql);
-                pst.executeQuery("create table tmp.jdbc_example1(day Date, name String, age UInt8) Engine=Log");
+                pst = conn.prepareStatement(sql);
+                //pst.executeQuery("create table tmp.jdbc_example1(day Date, name String, age UInt8) Engine=Log");
 
             }
 
