@@ -23,6 +23,15 @@ import java.util.Iterator;
 /**
  * @Classname WaterMarkDemo
  * @Description 水印机制demo代码
+ * todo 牢记水印特点：
+ * 1.watermark 是一条特殊的数据记录（只用来触发窗口结束，不参与数据计算）
+ * 2.watermark 必须单调递增，以确保任务的事件时间时钟在向前推进，而不是在后退（就算延迟数据到来了，比目前的水印小，他也不会倒退了，而是直接不赋值，return掉）
+ *  在org.apache.flink.streaming.runtime.operators.TimestampsAndWatermarksOperator.emitWatermark 方法中
+ * 3.watermark 与数据的时间戳相关
+ *  目前遇到一个问题：在下面的水印代码和窗口代码都写好了的时候，发现有时候水印能触发窗口结束，有时候不能，后面发现代码有问题，在我们初始化水印时间的时候使用了
+ *     private long maxTimeStamp = Long.MIN_VALUE; 当没数据来的时候，代码运行到这里给他赋值，然后他在减去允许迟到的时间，这时候该值就变成了
+ *     导致在emitWatermark 吧该值赋值给了currentWatermark，所以后面再来数据的的时候，数据的eventtime的水印时间都要比这个小，所以都不会触发窗口了。
+ *     窗口触发条件，(1)在[window_start_time,window_end_time)窗口中有数据存在(2)watermark时间 >= window_end_time；
  * @Date 2021/11/19 17:28
  * @Created by huni
  */
@@ -38,7 +47,7 @@ public class WaterMarkDemo {
         //设置并行度
         env.setParallelism(1);
         //2.获取数据
-        DataStreamSource<String> streamSource = env.socketTextStream("172.16.5.29", 7777);
+        DataStreamSource<String> streamSource = env.socketTextStream("linux121", 7777);
         //3.逻辑代码
         SingleOutputStreamOperator<Tuple2<String, Long>> maped = streamSource.map(new MapFunction<String, Tuple2<String, Long>>() {
             @Override
@@ -53,7 +62,7 @@ public class WaterMarkDemo {
             @Override
             public WatermarkGenerator<Tuple2<String, Long>> createWatermarkGenerator(WatermarkGeneratorSupplier.Context context) {
                 return new WatermarkGenerator<Tuple2<String, Long>>() {
-                    private long maxTimeStamp = Long.MIN_VALUE;
+                    private long maxTimeStamp = 0l;
 
                     @Override
                     public void onEvent(Tuple2<String, Long> event, long eventTimestamp, WatermarkOutput output) {
