@@ -38,11 +38,14 @@ public class MyLoginFailCEP {
         Properties props = new Properties();
         props.setProperty("bootstrap.servers","linux121:9092");
         props.setProperty("group.id","mygp");
+        props.setProperty("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        props.setProperty("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 
         FlinkKafkaConsumer<String> consumer = new FlinkKafkaConsumer<String>(topic, new SimpleStringSchema(), props);
         //设置从最新的offset开始消费
         consumer.setStartFromGroupOffsets();
         consumer.setCommitOffsetsOnCheckpoints(true);
+
         //自动提交offset
         consumer.setCommitOffsetsOnCheckpoints(true);
 
@@ -81,7 +84,8 @@ public class MyLoginFailCEP {
                       1234,10.0.1.4,fail,1611373944100--迟到数据
                       1234,10.0.1.4,fail,1611373946000
                       1234,10.0.1.4,fail,1611373947000
-                      *  因为第一条数据与第二条数据差大于2s,所以第二条数据触发的窗口1611373943500>1611373943000 所有第一条数据能与后面两条迟到的数据不能满足规则
+                      *  因为第一条数据与第二条数据差大于2s,所以第二条数据1611373945500水印触发的窗口1611373943500>1611373943000 所有第一条数据能与后面两条迟到的数据不能满足规则
+                      * 而有时候我们为什么能看到输出呢？ 因为我们是读取文件或者直接在文件流中，吧所有数据全部输出了（没按照时间戳一下下输出），这样获取的水印就直接是最后一个了，前面的就都能输出
                     * */
                     long maxOutOfOrderness = 2000l;
 
