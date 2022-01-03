@@ -64,12 +64,13 @@ public class WaterMarkDemo {
                 return new WatermarkGenerator<Tuple2<String, Long>>() {
                     private long maxTimeStamp = 0l;
 
+                    //output 基于事件生成Watermark发射出去（一个事件发射一个）
                     @Override
                     public void onEvent(Tuple2<String, Long> event, long eventTimestamp, WatermarkOutput output) {
                         maxTimeStamp = Math.max(maxTimeStamp, event.f1);
                         System.out.println("maxTimeStamp:" + maxTimeStamp + "...format:" + sdf.format(maxTimeStamp));
                     }
-
+                    //基于事件周期性的生成Watermark发射出去（1s一个）
                     @Override
                     public void onPeriodicEmit(WatermarkOutput output) {
                       //  System.out.println(".....onPeriodicEmit....");
