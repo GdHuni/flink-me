@@ -80,6 +80,12 @@ public class WaterMarkDemo {
                 };
             }
         }.withTimestampAssigner(new SerializableTimestampAssigner<Tuple2<String, Long>>() {
+            /**
+             * 根据那个字段来生成水印
+             * @param element
+             * @param recordTimestamp
+             * @return
+             */
             @Override
             public long extractTimestamp(Tuple2<String, Long> element, long recordTimestamp) {
                 return element.f1;
