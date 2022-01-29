@@ -1,8 +1,11 @@
 package sink;
 
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.calcite.shaded.org.apache.commons.io.FileUtils;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -15,7 +18,10 @@ import org.apache.flink.streaming.connectors.redis.common.mapper.RedisCommand;
 import org.apache.flink.streaming.connectors.redis.common.mapper.RedisCommandDescription;
 import org.apache.flink.streaming.connectors.redis.common.mapper.RedisMapper;
 
+import java.io.File;
+import java.util.List;
 import java.util.Properties;
+import java.util.Scanner;
 
 /**
  * @Classname CustomKafkaSourceToRedisSink
@@ -27,6 +33,7 @@ public class SinkToRedis{
     public static void main(String[] args) throws Exception {
         //1.准备环境
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        env.registerCachedFile("D:/data.txt", "testfile");
         //2.读取数据源数据
         //设置kafka配置
         String topic = "huni_topic";
@@ -35,9 +42,8 @@ public class SinkToRedis{
         props.setProperty("group.id","mygp");
 
         FlinkKafkaConsumer<String> consumer = new FlinkKafkaConsumer<String>(topic, new SimpleStringSchema(), props);
-        //设置从最新的offset开始消费
+        //从当前消费组记录的偏移量开始，接着上次的偏移量消费
         consumer.setStartFromGroupOffsets();
-        consumer.setCommitOffsetsOnCheckpoints(true);
         //自动提交offset
         consumer.setCommitOffsetsOnCheckpoints(true);
 
@@ -46,7 +52,16 @@ public class SinkToRedis{
         int parallelism = data.getParallelism();
         System.out.println("...parallelism" + parallelism);
         //处理逻辑
-        SingleOutputStreamOperator<Tuple2<String, Integer>> maped = data.map(new MapFunction<String, Tuple2<String, Integer>>() {
+        SingleOutputStreamOperator<Tuple2<String, Integer>> maped = data.map(new RichMapFunction<String, Tuple2<String, Integer>>() {
+            //改成了 richFunction  自定义读取文件功能
+            @Override
+            public void open(Configuration parameters) throws Exception {
+
+                File file = getRuntimeContext().getDistributedCache().getFile("testfile");
+                List<String> strings = FileUtils.readLines(file.getAbsoluteFile());
+                System.out.println(strings);
+            }
+
             @Override
             public Tuple2<String, Integer> map(String value) throws Exception {
                 return new Tuple2<String,Integer>(value,1);

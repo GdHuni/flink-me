@@ -13,6 +13,7 @@ import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
 import org.apache.flink.streaming.api.windowing.assigners.*;
 import org.apache.flink.streaming.api.windowing.evictors.CountEvictor;
 import org.apache.flink.streaming.api.windowing.time.Time;
+import org.apache.flink.streaming.api.windowing.triggers.ContinuousProcessingTimeTrigger;
 import org.apache.flink.streaming.api.windowing.triggers.CountTrigger;
 import org.apache.flink.streaming.api.windowing.triggers.PurgingTrigger;
 import org.apache.flink.streaming.api.windowing.windows.GlobalWindow;
@@ -76,16 +77,18 @@ public class TimeWindowDemo {
         //滚动
         keyedStream.window(GlobalWindows.create()).trigger(PurgingTrigger.of(CountTrigger.of(2)));
         //滑动
-        keyedStream.window(GlobalWindows.create())	.evictor(CountEvictor.of(2)).trigger(CountTrigger.of(1));*/
+        keyedStream.window(GlobalWindows.create()).evictor(CountEvictor.of(2)).trigger(CountTrigger.of(1));*/
 
 
         // 滚动窗口 基于时间驱动，每隔10s划分一个窗口,是按照实际时间来的，而不是数据发送的时间，类似10:09:59 发送过来，那么这个窗口到10:10:00就会关闭
-        WindowedStream<Tuple2<String, Integer>, String, TimeWindow> timeWindow = keyedStream.timeWindow(Time.milliseconds(10000)); //flink-1.12.0已弃用
-
+      //  WindowedStream<Tuple2<String, Integer>, String, TimeWindow> timeWindow = keyedStream.timeWindow(Time.seconds(20),Time.seconds(1)); //flink-1.12.0已弃用
+       //统计周期为一天的数据，因为这个一天的默认时间窗口从8点开始的，时区问题，所以需要减去8小时（这个还是滚动窗口）
+        WindowedStream<Tuple2<String, Integer>, String, TimeWindow> timeWindow =  keyedStream.window(TumblingProcessingTimeWindows.of(Time.days(1), Time.hours(-8)))
+                 .trigger(ContinuousProcessingTimeTrigger.of(Time.seconds(5)));
         // 滑动窗口 基于时间驱动，每隔10s划分一个窗口,每5s计算一次，总共计算10s的数据 是按照实际时间来的，而不是数据发送的时间，类似10:09:59 发送过来，那么这个窗口到10:10:00就会关闭
         //WindowedStream<Tuple2<String, Integer>, String, TimeWindow> timeWindow = keyedStream.timeWindow(Time.milliseconds(10000).Time.milliseconds(5000)); //flink-1.12.0已弃用
 
-        // apply是窗口的应用函数，即apply里的函数将应用在此窗口的数据上。
+        // apply是窗口的应用函数，即apply里的函数将应用在此窗口的数据上。进去的是基于key并且窗口的（就是相同的key,在规定的窗口时间进去的数据）
         timeWindow.apply(new WindowFunction<Tuple2<String, Integer>, String, String, TimeWindow>() {
             @Override
             /**

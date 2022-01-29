@@ -21,8 +21,7 @@ public class PropertiesUtil {
         public static void init() throws IOException {
             if (confProperties == null) {
                 confProperties = new Properties();
-                InputStream in = PropertiesUtil.class.getClassLoader().getResourceAsStream("config.properties");
-
+                InputStream in = PropertiesUtil.class.getClassLoader().getResourceAsStream("product/config.properties");
                 try {
                     confProperties.load(in);
                 } catch (IOException e) {
