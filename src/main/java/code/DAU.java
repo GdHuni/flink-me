@@ -15,6 +15,7 @@ import org.apache.flink.connector.jdbc.JdbcConnectionOptions;
 import org.apache.flink.connector.jdbc.JdbcExecutionOptions;
 import org.apache.flink.connector.jdbc.JdbcSink;
 import org.apache.flink.connector.jdbc.JdbcStatementBuilder;
+import org.apache.flink.runtime.state.filesystem.FsStateBackend;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
@@ -65,6 +66,12 @@ public class DAU {
         env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
         env.enableCheckpointing(10000);
         env.getCheckpointConfig().setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE);
+        // 设置checkpoint的超时时间
+        env.getCheckpointConfig().setCheckpointTimeout(60000);
+        // 如果在只做快照过程中出现错误，是否让整体任务失败：true是  false不是
+        env.getCheckpointConfig().setFailOnCheckpointingErrors(false);
+
+        env.setStateBackend(new FsStateBackend("hdfs://bigdata021200:8020/user/check"));
         Properties kafkaProps = new Properties();
 
 
@@ -82,7 +89,7 @@ public class DAU {
         //添加source 获取数据
         DataStreamSource<String> kafkaSourceData = env.addSource(consumer);
         SingleOutputStreamOperator<Tuple2<PcWapVo, Integer>> flatMap = kafkaSourceData
-                .filter(x -> URLDecoder.decode(x, "UTF-8").contains("/analysis/")&&URLDecoder.decode(x, "UTF-8").contains("id="))
+                //.filter(x -> URLDecoder.decode(x, "UTF-8").contains("/analysis/")&&URLDecoder.decode(x, "UTF-8").contains("id="))
                 .flatMap(new FlatMapFunction<String, Tuple2<PcWapVo, Integer>>() {
                     @Override
                     public void flatMap(String s, Collector<Tuple2<PcWapVo, Integer>> collector) throws Exception {
@@ -119,7 +126,7 @@ public class DAU {
                             加evictor 是因为，每次trigger，触发计算是，窗口中的所有数据都会参与，所以数据会触发很多次，比较浪费，加evictor 驱逐已经计算过的数据，就不会重复计算了
                             驱逐了已经计算过的数据，导致窗口数据不完全，所以需要state 存储我们需要的中间结果*/
                     ValueState<Tuple2<String, Long>> pvCount;
-                    MapState<String, String> uvCount;
+                    MapState<String,String> uvCount;
 
                     @Override
                     public void open(Configuration parameters) throws Exception {
@@ -131,9 +138,7 @@ public class DAU {
                         );
                         MapStateDescriptor wordStateDes = new MapStateDescriptor<>(
                                 "uvCount",
-                                TypeInformation.of(new TypeHint<String>() {
-                                }), TypeInformation.of(new TypeHint<String>() {
-                        })
+                                TypeInformation.of(new TypeHint<String>() {}),TypeInformation.of(new TypeHint<String>() {})
                         );
 
 
@@ -147,17 +152,17 @@ public class DAU {
                     public void process(String s, Context context, Iterable<Tuple2<PcWapVo, Integer>> elements, Collector<PcWapVo> out) throws Exception {
                         long pv = 0;
                         for (Tuple2<PcWapVo, Integer> element : elements) {
-                            pv++;
+                            pv ++;
                             String word = element.f0.getWid();
                             uvCount.put(word, null);
                         }
-                        if (null == pvCount.value()) {
-                            pvCount.update(new Tuple2<>(s, pv));
-                        } else {
-                            pvCount.update(new Tuple2<>(s, pvCount.value().f1 + pv));
+                        if(null == pvCount.value()){
+                            pvCount.update(new Tuple2<>(s,pv));
+                        }else{
+                            pvCount.update(new Tuple2<>(s,pvCount.value().f1 + pv));
                         }
 
-                        long count = 0;
+                        long  count  = 0;
                         Iterator<String> iterator = uvCount.keys().iterator();
                         while (iterator.hasNext()) {
                             iterator.next();
