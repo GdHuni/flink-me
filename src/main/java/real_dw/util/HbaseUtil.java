@@ -34,7 +34,7 @@ public class HbaseUtil {
            conf.set(ZOOKEEPER_CLIENT_PORT,"2181");
            conf.setInt(HBASE_CLIENT_OPERATION_TIMEOUT,30000);
            conf.setInt(HBASE_CLIENT_SCANNER_TIMEOUT_PERIOD,30000);
-           Connection connection = ConnectionFactory.createConnection(conf);
+           connection = ConnectionFactory.createConnection(conf);
        } catch (IOException e) {
            e.printStackTrace();
        }

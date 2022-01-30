@@ -1,7 +1,5 @@
 package real_dw.entity;
 
-import scala.Int;
-
 import java.io.Serializable;
 
 /**
@@ -9,28 +7,51 @@ import java.io.Serializable;
  */
 public class TradeOrdersVo implements Serializable {
 
-    private Integer orderId;
+    private String orderId;
     private String orderNo;
     private String userId;
-    private Integer status;
-    private double productMoney;
-    private double totalMoney;
-    private Integer payMethod;
-    private Integer isPay;
-    private Integer areaId;
-    private Integer tradeSrc;
-    private Integer tradeType;
-    private Integer isRefund;
-    private Integer dataFlag;
+    private String status;
+    private String productMoney;
+    private String totalMoney;
+    private String payMethod;
+    private String isPay;
+    private String areaId;
+    private String tradeSrc;
+    private String tradeType;
+    private String isRefund;
+    private String dataFlag;
     private String createTime;
     private String payTime;
     private String modifiedTime;
 
-    public Integer getOrderId() {
+
+    @Override
+    public String toString() {
+        return "TradeOrdersVo{" +
+                "orderId='" + orderId + '\'' +
+                ", orderNo='" + orderNo + '\'' +
+                ", userId='" + userId + '\'' +
+                ", status='" + status + '\'' +
+                ", productMoney=" + productMoney +
+                ", totalMoney=" + totalMoney +
+                ", payMethod='" + payMethod + '\'' +
+                ", isPay='" + isPay + '\'' +
+                ", areaId='" + areaId + '\'' +
+                ", tradeSrc='" + tradeSrc + '\'' +
+                ", tradeType='" + tradeType + '\'' +
+                ", isRefund='" + isRefund + '\'' +
+                ", dataFlag='" + dataFlag + '\'' +
+                ", createTime='" + createTime + '\'' +
+                ", payTime='" + payTime + '\'' +
+                ", modifiedTime='" + modifiedTime + '\'' +
+                '}';
+    }
+
+    public String getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(Integer orderId) {
+    public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
 
@@ -50,83 +71,83 @@ public class TradeOrdersVo implements Serializable {
         this.userId = userId;
     }
 
-    public Integer getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(Integer status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
-    public double getProductMoney() {
+    public String getProductMoney() {
         return productMoney;
     }
 
-    public void setProductMoney(double productMoney) {
+    public void setProductMoney(String productMoney) {
         this.productMoney = productMoney;
     }
 
-    public double getTotalMoney() {
+    public String getTotalMoney() {
         return totalMoney;
     }
 
-    public void setTotalMoney(double totalMoney) {
+    public void setTotalMoney(String totalMoney) {
         this.totalMoney = totalMoney;
     }
 
-    public Integer getPayMethod() {
+    public String getPayMethod() {
         return payMethod;
     }
 
-    public void setPayMethod(Integer payMethod) {
+    public void setPayMethod(String payMethod) {
         this.payMethod = payMethod;
     }
 
-    public Integer getIsPay() {
+    public String getIsPay() {
         return isPay;
     }
 
-    public void setIsPay(Integer isPay) {
+    public void setIsPay(String isPay) {
         this.isPay = isPay;
     }
 
-    public Integer getAreaId() {
+    public String getAreaId() {
         return areaId;
     }
 
-    public void setAreaId(Integer areaId) {
+    public void setAreaId(String areaId) {
         this.areaId = areaId;
     }
 
-    public Integer getTradeSrc() {
+    public String getTradeSrc() {
         return tradeSrc;
     }
 
-    public void setTradeSrc(Integer tradeSrc) {
+    public void setTradeSrc(String tradeSrc) {
         this.tradeSrc = tradeSrc;
     }
 
-    public Integer getTradeType() {
+    public String getTradeType() {
         return tradeType;
     }
 
-    public void setTradeType(Integer tradeType) {
+    public void setTradeType(String tradeType) {
         this.tradeType = tradeType;
     }
 
-    public Integer getIsRefund() {
+    public String getIsRefund() {
         return isRefund;
     }
 
-    public void setIsRefund(Integer isRefund) {
+    public void setIsRefund(String isRefund) {
         this.isRefund = isRefund;
     }
 
-    public Integer getDataFlag() {
+    public String getDataFlag() {
         return dataFlag;
     }
 
-    public void setDataFlag(Integer dataFlag) {
+    public void setDataFlag(String dataFlag) {
         this.dataFlag = dataFlag;
     }
 

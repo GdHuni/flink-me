@@ -1,5 +1,7 @@
 package real_dw.entity;
 
+import java.util.Objects;
+
 /**
  * @author huni
  * @Classname HbaseTradeOrdersVo
@@ -43,5 +45,32 @@ public class HbaseTradeOrdersVo {
 
     public void setDataInfo(String dataInfo) {
         this.dataInfo = dataInfo;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        HbaseTradeOrdersVo that = (HbaseTradeOrdersVo) o;
+        return Objects.equals(dateBaseName, that.dateBaseName) &&
+                Objects.equals(tableName, that.tableName) &&
+                Objects.equals(type, that.type) &&
+                Objects.equals(dataInfo, that.dataInfo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(dateBaseName, tableName, type, dataInfo);
+    }
+
+    @Override
+    public String toString() {
+        return "HbaseTradeOrdersVo{" +
+                "dateBaseName='" + dateBaseName + '\'' +
+                ", tableName='" + tableName + '\'' +
+                ", type='" + type + '\'' +
+                ", dataInfo='" + dataInfo + '\'' +
+                '}';
     }
 }

@@ -70,7 +70,7 @@ public class SinkToHbase extends RichSinkFunction<HbaseTradeOrdersVo> {
         //获取data数据信息
         JSONArray datas = JSONArray.parseArray(value.getDataInfo());
         //订单表数据
-        if(dateBaseName.equalsIgnoreCase("dwshow") && tableName.equalsIgnoreCase("lagou_trade_orders")) {
+        if(dateBaseName.equalsIgnoreCase("dwads") && tableName.equalsIgnoreCase("lagou_trade_orders")) {
             if(type.equalsIgnoreCase("insert")) {
                 for (Object data : datas) {
                     TradeOrdersVo tradeOrdersVo = JSON.toJavaObject(JSONObject.parseObject(data.toString()), TradeOrdersVo.class);

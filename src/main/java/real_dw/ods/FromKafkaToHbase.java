@@ -31,7 +31,7 @@ public class FromKafkaToHbase {
             vo.setDataInfo(jsonObject.getString("data"));
             return vo;
         });
-
+        map.print();
         //4.数据存储hbase
         map.addSink(new SinkToHbase());
 
