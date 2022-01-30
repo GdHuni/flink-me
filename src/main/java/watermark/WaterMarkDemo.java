@@ -76,6 +76,7 @@ public class WaterMarkDemo {
                       //  System.out.println(".....onPeriodicEmit....");
                         long maxOutOfOrderness = 3000l;
                         output.emitWatermark(new Watermark(maxTimeStamp - maxOutOfOrderness));
+                        System.out.println(maxTimeStamp - maxOutOfOrderness);
                     }
                 };
             }
