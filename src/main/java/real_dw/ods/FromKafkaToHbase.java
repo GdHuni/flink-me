@@ -18,9 +18,8 @@ public class FromKafkaToHbase {
         //1.设置环境
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         //2.读取kafka数据源
-        FlinkKafkaConsumer consumer = ReadFromKafkaUtil.getFlinkKafkaConsumer("tp_1");
+        FlinkKafkaConsumer consumer = ReadFromKafkaUtil.getFlinkKafkaConsumer("tp_2");
         DataStreamSource<String> source = env.addSource(consumer);
-
         //3.逻辑编写
         SingleOutputStreamOperator<HbaseTradeOrdersVo> map = source.map(x -> {
             JSONObject jsonObject = JSONObject.parseObject(x);

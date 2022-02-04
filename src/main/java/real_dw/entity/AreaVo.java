@@ -17,8 +17,8 @@ public class AreaVo implements Serializable {
     private String citycode;
     private String yzcode;
     private String mername;
-    private String lng;
-    private String lat;
+    private String Lng;
+    private String Lat;
     private String pinyin;
 
     public String getId() {
@@ -86,19 +86,19 @@ public class AreaVo implements Serializable {
     }
 
     public String getLng() {
-        return lng;
+        return Lng;
     }
 
     public void setLng(String lng) {
-        this.lng = lng;
+        Lng = lng;
     }
 
     public String getLat() {
-        return lat;
+        return Lat;
     }
 
     public void setLat(String lat) {
-        this.lat = lat;
+        Lat = lat;
     }
 
     public String getPinyin() {
@@ -120,8 +120,8 @@ public class AreaVo implements Serializable {
                 ", citycode='" + citycode + '\'' +
                 ", yzcode='" + yzcode + '\'' +
                 ", mername='" + mername + '\'' +
-                ", lng='" + lng + '\'' +
-                ", lat='" + lat + '\'' +
+                ", lng='" + Lng + '\'' +
+                ", lat='" + Lat + '\'' +
                 ", pinyin='" + pinyin + '\'' +
                 '}';
     }

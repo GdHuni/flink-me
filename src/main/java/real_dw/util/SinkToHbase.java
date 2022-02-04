@@ -29,13 +29,10 @@ public class SinkToHbase extends RichSinkFunction<HbaseTradeOrdersVo> {
     private BufferedMutatorParams params;
     private BufferedMutator mutator;
 
-
-    private String cf = "info";
-    private String tableName = "trade_orders";
-
-    @Override
+        @Override
     public void open(Configuration parameters) {
         try {
+            String tableName = "trade_orders";
             connection = HbaseUtil.getHbaseConnection("linux121,linux122,linux123");
             table = connection.getTable(TableName.valueOf(tableName));
             /*params = new BufferedMutatorParams(TableName.valueOf(tableName));
@@ -81,8 +78,15 @@ public class SinkToHbase extends RichSinkFunction<HbaseTradeOrdersVo> {
             }
         } else if (dateBaseName.equalsIgnoreCase("dwads") && tableName.equalsIgnoreCase("lagou_area")) {
             //hbase只会保存最新版本
+            try {
+                 table = connection.getTable(TableName.valueOf("area"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             for (Object data : datas) {
-                AreaVo areaVo = JSON.toJavaObject(JSONObject.parseObject(data.toString()), AreaVo.class);
+                AreaVo areaVo = JSON.parseObject(data.toString(), AreaVo.class);
+                //首字母为大写的话获取不到
+                //AreaVo areaVo = JSON.toJavaObject(JSONObject.parseObject(data.toString()), AreaVo.class);
                 if (type.equalsIgnoreCase("insert") || type.equalsIgnoreCase("update")) {
                     insertArea(table, areaVo);
                 } else if (type.equalsIgnoreCase("delete")) {
@@ -96,7 +100,7 @@ public class SinkToHbase extends RichSinkFunction<HbaseTradeOrdersVo> {
      * 订单信息插入hbase
      *
      * @param table    hbase 表对象
-     * @param areaInfo 订单实体类
+     * @param tradeOrdersVo 订单实体类
      */
     public void insertTradeOrders(Table table, TradeOrdersVo tradeOrdersVo) {
         try {
@@ -127,7 +131,7 @@ public class SinkToHbase extends RichSinkFunction<HbaseTradeOrdersVo> {
      * hbase根据id删除订单信息
      *
      * @param table    hbase 表对象
-     * @param areaInfo 订单信息实体类
+     * @param tradeOrdersVo 订单信息实体类
      */
     public void deleteTradeOrders(Table table, TradeOrdersVo tradeOrdersVo) {
         try {
