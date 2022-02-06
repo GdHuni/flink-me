@@ -1,7 +1,6 @@
 package real_dw.util;
 
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
-import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 
 import java.util.Properties;
@@ -12,7 +11,7 @@ import java.util.Properties;
  * @Date 2022/1/29 16:21
  * @author huni
  */
-public class ReadFromKafkaUtil {
+public class SourceFromKafkaUtil {
     public static FlinkKafkaConsumer getFlinkKafkaConsumer(String topic) {
         FlinkKafkaConsumer consumer=null;
         try{

@@ -1,24 +1,24 @@
 package real_dw.ods;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import real_dw.entity.HbaseTradeOrdersVo;
-import real_dw.entity.TradeOrdersVo;
-import real_dw.util.ReadFromKafkaUtil;
-import real_dw.util.SinkToHbase;
+import real_dw.util.SourceFromKafkaUtil;
 
+
+/**
+ * 从kafka中获取流数据
+ */
 public class FromKafkaToHbase {
 
     public static void main(String[] args) throws Exception {
         //1.设置环境
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         //2.读取kafka数据源
-        FlinkKafkaConsumer consumer = ReadFromKafkaUtil.getFlinkKafkaConsumer("tp_2");
+        FlinkKafkaConsumer consumer = SourceFromKafkaUtil.getFlinkKafkaConsumer("tp_2");
         DataStreamSource<String> source = env.addSource(consumer);
         //3.逻辑编写
         SingleOutputStreamOperator<HbaseTradeOrdersVo> map = source.map(x -> {

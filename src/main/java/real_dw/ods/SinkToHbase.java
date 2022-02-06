@@ -1,4 +1,4 @@
-package real_dw.util;
+package real_dw.ods;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -11,6 +11,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 import real_dw.entity.AreaVo;
 import real_dw.entity.HbaseTradeOrdersVo;
 import real_dw.entity.TradeOrdersVo;
+import real_dw.util.HbaseUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 /**
  * @author huni
  * @Classname SinkToHbase
- * @Description TODO
+ * @Description sink到hbase的工具类
  * @Date 2022/1/30 10:20
  */
 public class SinkToHbase extends RichSinkFunction<HbaseTradeOrdersVo> {
@@ -32,6 +33,7 @@ public class SinkToHbase extends RichSinkFunction<HbaseTradeOrdersVo> {
         @Override
     public void open(Configuration parameters) {
         try {
+//            String tableName = "area";
             String tableName = "trade_orders";
             connection = HbaseUtil.getHbaseConnection("linux121,linux122,linux123");
             table = connection.getTable(TableName.valueOf(tableName));
@@ -77,12 +79,6 @@ public class SinkToHbase extends RichSinkFunction<HbaseTradeOrdersVo> {
                 }
             }
         } else if (dateBaseName.equalsIgnoreCase("dwads") && tableName.equalsIgnoreCase("lagou_area")) {
-            //hbase只会保存最新版本
-            try {
-                 table = connection.getTable(TableName.valueOf("area"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
             for (Object data : datas) {
                 AreaVo areaVo = JSON.parseObject(data.toString(), AreaVo.class);
                 //首字母为大写的话获取不到
@@ -152,16 +148,16 @@ public class SinkToHbase extends RichSinkFunction<HbaseTradeOrdersVo> {
         try {
             //创建put对象
             Put put = new Put(Bytes.toBytes(areaInfo.getId()));
-            put.addColumn("info".getBytes(), "name".getBytes(), areaInfo.getName().getBytes());
-            put.addColumn("info".getBytes(), "pid".getBytes(), areaInfo.getPid().getBytes());
-            put.addColumn("info".getBytes(), "sname".getBytes(), areaInfo.getSname().getBytes());
-            put.addColumn("info".getBytes(), "level".getBytes(), areaInfo.getLevel().getBytes());
-            put.addColumn("info".getBytes(), "citycode".getBytes(), areaInfo.getCitycode().getBytes());
-            put.addColumn("info".getBytes(), "yzcode".getBytes(), areaInfo.getYzcode().getBytes());
-            put.addColumn("info".getBytes(), "mername".getBytes(), areaInfo.getMername().getBytes());
-            put.addColumn("info".getBytes(), "lng".getBytes(), areaInfo.getLng().getBytes());
-            put.addColumn("info".getBytes(), "lat".getBytes(), areaInfo.getLat().getBytes());
-            put.addColumn("info".getBytes(), "pinyin".getBytes(), areaInfo.getPinyin().getBytes());
+            put.addColumn(Bytes.toBytes("info"), Bytes.toBytes("name"), areaInfo.getName().getBytes());
+            put.addColumn(Bytes.toBytes("info"),  Bytes.toBytes("pid"),  Bytes.toBytes(areaInfo.getPid()));
+            put.addColumn(Bytes.toBytes("info"),  Bytes.toBytes("sname"),  Bytes.toBytes(areaInfo.getSname()));
+            put.addColumn(Bytes.toBytes("info"),  Bytes.toBytes("level"),  Bytes.toBytes(areaInfo.getLevel()));
+            put.addColumn(Bytes.toBytes("info"),  Bytes.toBytes("citycode"),  Bytes.toBytes(areaInfo.getCitycode()));
+            put.addColumn(Bytes.toBytes("info"),  Bytes.toBytes("yzcode"),  Bytes.toBytes(areaInfo.getYzcode()));
+            put.addColumn(Bytes.toBytes("info"),  Bytes.toBytes("mername"),  Bytes.toBytes(areaInfo.getMername()));
+            put.addColumn(Bytes.toBytes("info"),  Bytes.toBytes("lng"),  Bytes.toBytes(areaInfo.getLng()));
+            put.addColumn(Bytes.toBytes("info"),  Bytes.toBytes("lat"),  Bytes.toBytes(areaInfo.getLat()));
+            put.addColumn(Bytes.toBytes("info"),  Bytes.toBytes("pinyin"),  Bytes.toBytes(areaInfo.getPinyin()));
             table.put(put);
         } catch (IOException e) {
             e.printStackTrace();
