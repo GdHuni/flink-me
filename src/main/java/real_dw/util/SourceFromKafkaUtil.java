@@ -17,7 +17,8 @@ public class SourceFromKafkaUtil {
         try{
             //2.读取kafka数据源 配置kafka信息
             Properties props = new Properties();
-            props.setProperty("bootstrap.servers","linux121:9092,linux122:9092,linux123:9092");
+            String servers = PropertiesUtil.readValue("bootstrap.servers");
+            props.setProperty("bootstrap.servers",servers);
             props.setProperty("group.id","mygp");
             consumer = new FlinkKafkaConsumer(topic,new SimpleStringSchema(),props);
             //从当前消费组记录的偏移量开始，接着上次的偏移量消费
