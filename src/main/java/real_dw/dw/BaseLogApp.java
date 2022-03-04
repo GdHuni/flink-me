@@ -50,14 +50,8 @@ public class BaseLogApp {
         DataStreamSource<String> kafkaDS = env.addSource( SourceFromKafkaUtil.getFlinkKafkaConsumer(sourceTopic));
         kafkaDS.print();
         //TODO 3.将每行数据转换为JSON对象
-        OutputTag dir = new OutputTag("dir"){};
+        OutputTag<String> dir = new OutputTag<String>("dir"){};
         SingleOutputStreamOperator<JSONObject> jsonData = kafkaDS.process(new ProcessFunction<String, JSONObject>() {
-            private ValueState<String> state;
-            @Override
-            public void open(Configuration parameters) throws Exception {
-                state = getRuntimeContext().getState(new ValueStateDescriptor<String>("phone",String.class));
-            }
-
             @Override
             public void processElement(String value, Context ctx, Collector<JSONObject> out) throws Exception {
                 try {
@@ -110,17 +104,17 @@ public class BaseLogApp {
         });
 
         //TODO 5.分流  侧输出流 不带workerid的公共流量 ：主流  带workerid的私域流量
-        OutputTag publicData = new OutputTag("publicData"){};
-        SingleOutputStreamOperator<JSONObject> priData = firstData.process(new ProcessFunction<JSONObject, JSONObject>() {
+        OutputTag<String> publicData = new OutputTag<String>("publicData"){};
+        SingleOutputStreamOperator<String> priData = firstData.process(new ProcessFunction<JSONObject, String>() {
             @Override
-            public void processElement(JSONObject value, Context ctx, Collector<JSONObject> out) throws Exception {
+            public void processElement(JSONObject value, Context ctx, Collector<String> out) throws Exception {
                 String workerId = value.getString("workerId");
                 //私域流量
                 if(StringUtils.isNotBlank(workerId)){
-                    out.collect(value);
+                    out.collect(value.toJSONString());
                 }else{
                     //公域流量
-                    ctx.output(publicData,value);
+                    ctx.output(publicData,value.toJSONString());
                 }
             }
         });
